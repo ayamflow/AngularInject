@@ -26,15 +26,14 @@ and to something like this after the plugin action (notice the $window injection
 
 `angular.module('myApp.controllers', []).controller('MyCtrl', [ '$http', '$window', function($http, $window) { ... }`
 
-It is (for now) designed for one module per file so if you have multiples modules (like controllers) in the same file, only the first one will be targeted by this plugin.
+If multiple modules exist on the same file, you will be ask to chose the one to inject.
 
 ##Next Step
 ###Know issues
 A lot ?
 ###Todo
-1. If multiple modules in the same file, enable to chose which one to inject
-2. Allow to remove an injection from the module
-3. Make the plugin work if no injection exists
+1. Allow to remove an injection from the module
+2. Make the plugin work if no injection exists ( with module declared like angular.module('controller', 'MyCtrl', function() ...))
 
 ##Contributing
 Feel free to modify, share, comment any bug or fork. Just [drop a tweet](http://twitter.com/ayamflow) if you do !
