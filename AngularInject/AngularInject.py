@@ -1,48 +1,82 @@
-import sublime, sublime_plugin
+import sublime
+import sublime_plugin
+
 
 class AngularInjectCommand(sublime_plugin.TextCommand):
-  def run(self, edit):
-    self.view.window().show_input_panel("Dependency name:", '', self.on_done, None, None)
-  def on_done(self, value):
-    view = self.view.window().active_view()
-    top_point = self.view.text_point(0, 0)
+  # RegEx variables
+    moduleRegEx = "(controller\(|factory\(|service\(|provider\(|directive\(|filter\(|config\(|run\()"
+    injectRegEx = "\[.+,\s*function\(.+\)"
+    functionRegEx = "\[\s*function\s*\("
+    iFunctionRegEx = ",\s*function"
+    parenthesisRegEx = "\s*\)"
 
-    start_point = view.find("(controller\(|factory\(|directive\(|filter\(|config\(|run\()", top_point).begin()
-    result_region = view.find("\[.+,\s*function\(.+\)", start_point)
-    prev_dependancies = view.substr(result_region)
-    # print prev_dependancies
+    def run(self, edit):
+        self.view.window().show_input_panel("Dependency name:", '', self.on_done, None, None)
 
-    # Check if the new dependacy isn't already there
-    if value in prev_dependancies:
-        sublime.status_message(value + " Dependency is already injected.")
-        return false
+    def on_done(self, value):
+        view = self.view.window().active_view()
+        # top_point = self.view.text_point(0, 0)
 
-    # find the ", function" in result_region
-    function_region = view.find(",\s*function", result_region.begin())
-    # find the last ")" in result_region
-    parenthesis_region = view.find("\s*\)", result_region.begin())
+        self.requestedInjection = value
 
-    # if both regexp match, replace them to add the new dependacy
-    if not function_region.empty() and not parenthesis_region.empty():
-        # create write access
-        edit = view.begin_edit()
-        # inject the dependency (finally !)
-        view.replace(edit, parenthesis_region, ", " + value + ")")
-        view.replace(edit, function_region, ", '" + value + "', function")
-        # notify the user
-        sublime.status_message("Injected AngularJS Dependency: " + value)
-        # end file write access
-        view.end_edit(edit)
-    else:
-        # doesn't work ?
-        sublime.status_message("Couldn't find where to inject.")
+        self.modules_regions = view.find_all(self.moduleRegEx)
+        if len(self.modules_regions) > 1:
+            modules_list = []
+            for region in self.modules_regions:
+                start = region.begin()
+                end = region.end() + 20
+                nRegion = sublime.Region(start, end)
+                modules_list.append(view.substr(nRegion) + "...")
+
+            sublime.active_window().show_quick_panel(modules_list, self.on_choice)
+        else:
+            self.inject(self.modules_regions[0])
+
+    def on_choice(self, value):
+        if value > -1:
+            region = self.modules_regions[value]
+            self.inject(region)
+
+    def inject(self, region):
+        start_point = region.end()
+        view = self.view.window().active_view()
+
+        result_region = view.find(self.injectRegEx, start_point)
+
+        if result_region:
+            prev_dependancies = view.substr(result_region)
+
+            # Check if the new dependacy isn't already there
+            if self.requestedInjection in prev_dependancies:
+                sublime.status_message(self.requestedInjection + " Dependency is already injected.")
+                return
+
+            # find the ", function" in result_region
+            function_region = view.find(self.iFunctionRegEx, result_region.begin())
+            # find the last ")" in result_region
+            parenthesis_region = view.find(self.parenthesisRegEx, result_region.begin())
+
+            # if both regexp match, replace them to add the new dependacy
+            if not function_region.empty() and not parenthesis_region.empty():
+                # create write access
+                edit = view.begin_edit()
+                # inject the dependency (finally !)
+                view.replace(edit, parenthesis_region, ", " + self.requestedInjection + ")")
+                view.replace(edit, function_region, ", '" + self.requestedInjection + "', function")
+                # notify the user
+                sublime.status_message("Injected AngularJS Dependency: " + self.requestedInjection)
+                # end file write access
+                view.end_edit(edit)
+            else:
+                # doesn't work ?
+                sublime.status_message("Couldn't find where to inject.")
+        else:
+            result_region = view.find(self.functionRegEx, start_point)
+            prev_dependancies = view.substr(result_region)
+            edit = view.begin_edit()
+            view.replace(edit, result_region, "[ '" + self.requestedInjection + "', function(" + self.requestedInjection)
 
 
-
-# TODO LIST
-#
-# test that result_region starts with angular.module
-# if more than one angular.module, show a list of all of them, so the user chooses the one he wants to inject
-# enable inject with other methods ( like $controller.inject([...]) )
-#
-#
+    # TODO LIST
+    #
+    # enable inject with other methods ( like $controller.inject([...]) )
