@@ -15,11 +15,14 @@ class AngularInjectCommand(sublime_plugin.TextCommand):
 
     def on_done(self, value):
         view = self.view.window().active_view()
-        # top_point = self.view.text_point(0, 0)
 
+        # save the requested injection
         self.requestedInjection = value
 
+        # find all modules in the file
         self.modules_regions = view.find_all(self.moduleRegEx)
+
+        # if multiple modules : show the list
         if len(self.modules_regions) > 1:
             modules_list = []
             for region in self.modules_regions:
@@ -29,9 +32,12 @@ class AngularInjectCommand(sublime_plugin.TextCommand):
                 modules_list.append(view.substr(nRegion) + "...")
 
             sublime.active_window().show_quick_panel(modules_list, self.on_choice)
+
+        # else inject
         else:
             self.inject(self.modules_regions[0])
 
+    # inject the chosen module, in a multiple modules file
     def on_choice(self, value):
         if value > -1:
             region = self.modules_regions[value]
@@ -43,6 +49,7 @@ class AngularInjectCommand(sublime_plugin.TextCommand):
 
         result_region = view.find(self.injectRegEx, start_point)
 
+        # If we already have a dependency in this module...
         if result_region:
             prev_dependancies = view.substr(result_region)
 
@@ -70,6 +77,8 @@ class AngularInjectCommand(sublime_plugin.TextCommand):
             else:
                 # doesn't work ?
                 sublime.status_message("Couldn't find where to inject.")
+
+        # If we don't have any dependency, things are much simpler
         else:
             result_region = view.find(self.functionRegEx, start_point)
             prev_dependancies = view.substr(result_region)
@@ -80,4 +89,3 @@ class AngularInjectCommand(sublime_plugin.TextCommand):
     # TODO LIST
     #
     # enable inject with other methods ( like $controller.inject([...]) )
-    # space between function and () isn't taken care of
