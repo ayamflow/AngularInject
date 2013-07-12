@@ -34,6 +34,7 @@ A lot ?
 ###Todo
 1. Allow to remove an injection from the module
 2. Make the plugin work if no injection exists ( with module declared like angular.module('controller', 'MyCtrl', function() ...))
+3. Insure that the modified line is really the [ function() from the module
 
 ##Contributing
 Feel free to modify, share, comment any bug or fork. Just [drop a tweet](http://twitter.com/ayamflow) if you do !

@@ -5,7 +5,7 @@ import sublime_plugin
 class AngularInjectCommand(sublime_plugin.TextCommand):
   # RegEx variables
     moduleRegEx = "(controller\(|factory\(|service\(|provider\(|directive\(|filter\(|config\(|run\()"
-    injectRegEx = "\[.+,\s*function\(.+\)"
+    injectRegEx = "\[.+,\s*function\s*\(.+\)"
     functionRegEx = "\[\s*function\s*\("
     iFunctionRegEx = ",\s*function"
     parenthesisRegEx = "\s*\)"
@@ -80,3 +80,4 @@ class AngularInjectCommand(sublime_plugin.TextCommand):
     # TODO LIST
     #
     # enable inject with other methods ( like $controller.inject([...]) )
+    # space between function and () isn't taken care of
