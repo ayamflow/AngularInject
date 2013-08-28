@@ -5,7 +5,7 @@ import sublime_plugin
 class AngularInjectCommand(sublime_plugin.TextCommand):
   # RegEx variables
     moduleRegEx = "(controller\(|factory\(|service\(|provider\(|directive\(|filter\(|config\(|run\()"
-    injectRegEx = "\[.+,\s*function\s*\(.+\)"
+    injectRegEx = "\[\s*.+,\s*function\s*\(.+\)"
     functionRegEx = "\[\s*function\s*\("
     iFunctionRegEx = ",\s*function"
     parenthesisRegEx = "\s*\)"
