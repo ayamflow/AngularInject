@@ -4,7 +4,9 @@ Sublime Text 2 Plugin : AngularInject
 Convenient Sublime Text 2 Plugin to quickly inject a dependency into any AngularJS module
 
 ##Installation
-Only manual installation for now.
+### With Package Control:
+Just search for AngularInject package and confirm. Tada !
+### Manually:
 Download and extract into your ST2 Packages folder. That's it.
 This directory can be found on Mac OS at `~/Library/Application Support/Sublime Text 2/Packages/`
 
@@ -33,7 +35,7 @@ If multiple modules exist on the same file, you will be ask to chose the one to 
 A lot ?
 ###Todo
 1. Allow to remove an injection from the module
-2. Make the plugin work if no injection exists ( with module declared like angular.module('controller', 'MyCtrl', function() ...))
+2. Make the plugin work with no min-safe version (`MyCtrl.$inject[…]` or `controller('MyCtrl', function()…`)3. inject)
 3. Insure that the modified line is really the [ function() from the module
 
 ##Contributing
